@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新标签页</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-bg="gradient">
+<div class="page">
+
+  <!-- 顶部按钮区 -->
+  <button class="top-corner-btn top-left" type="button" aria-label="菜单">☰</button>
+
+  <div class="top-right-group">
+    <div id="weatherBox" class="weather-box hidden" aria-live="polite">
+      <span id="weatherIcon" class="weather-icon">☀</span>
+      <span id="weatherText" class="weather-text">天气加载中...</span>
+    </div>
+
+    <button id="settingsBtn" class="top-corner-btn top-right-btn" type="button" aria-label="设置">⚙</button>
+  </div>
+
+  <!-- 主体区域 -->
+  <main class="center">
+
+    <!-- 搜索区域 -->
+    <section class="search-area">
+      <form id="searchForm" class="search-box" autocomplete="off">
+        <span class="icon">⌕</span>
+        <input
+                id="searchInput"
+                type="text"
+                placeholder="搜索网页"
+                autocomplete="off"
+                spellcheck="false"
+        >
+        <button class="search-btn" type="submit">搜索</button>
+      </form>
+
+      <div id="suggestPanel" class="suggest-panel">
+        <div id="suggestList" class="suggest-list"></div>
+
+        <div class="suggest-footer">
+          <button id="clearHistoryBtn" class="footer-link-btn" type="button">清除历史记录</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 快捷入口区域 -->
+    <section id="shortcutSection" class="shortcut-section">
+      <div class="shortcut-bar-wrap">
+        <button id="addSiteBtn" class="add-btn" type="button" aria-label="添加网站">＋</button>
+        <div id="shortcutBar" class="shortcut-bar"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 设置面板 -->
+  <aside id="settingsPanel" class="settings-panel" aria-label="设置面板">
+    <div class="settings-title">设置</div>
+
+    <div class="setting-group">
+      <label class="setting-label" for="bgSelector">背景切换</label>
+      <select id="bgSelector" class="setting-select">
+        <option value="gradient">柔和渐变</option>
+        <option value="warm">暖色背景</option>
+        <option value="cool">灰色背景</option>
+        <option value="image1">背景图片 1</option>
+        <option value="image2">背景图片 2</option>
+      </select>
+    </div>
+
+    <div class="setting-group">
+      <label class="setting-label" for="engineSelector">搜索引擎</label>
+      <select id="engineSelector" class="setting-select">
+        <option value="google">Google</option>
+        <option value="bing">Bing</option>
+        <option value="duckduckgo">DuckDuckGo</option>
+        <option value="baidu">百度</option>
+      </select>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-row">
+        <span class="setting-label-inline">显示快捷入口</span>
+        <label class="switch">
+          <input id="toggleShortcuts" type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <div class="setting-row">
+        <span class="setting-label-inline">显示天气</span>
+        <label class="switch">
+          <input id="toggleWeather" type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- Toast 提示 -->
+<div id="toast" class="toast" aria-live="polite"></div>
+
+<!-- 添加网站弹窗 -->
+<div id="modalOverlay" class="modal-overlay">
+  <div id="addSiteModal" class="add-site-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <h2 id="modalTitle" class="modal-title">添加网站</h2>
+      <button id="closeModalBtn" class="modal-close" type="button" aria-label="关闭">×</button>
+    </div>
+
+    <div class="modal-body">
+      <input
+              id="siteNameInput"
+              class="modal-input"
+              type="text"
+              maxlength="24"
+              placeholder="名称"
+      >
+      <input
+              id="siteUrlInput"
+              class="modal-input"
+              type="text"
+              placeholder="网址"
+      >
+    </div>
+
+    <div class="modal-actions">
+      <button id="confirmAddBtn" class="modal-btn modal-btn-primary" type="button" disabled>添加</button>
+      <button id="cancelAddBtn" class="modal-btn modal-btn-secondary" type="button">取消</button>
+    </div>
+  </div>
+</div>
+
+<script src="weather.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

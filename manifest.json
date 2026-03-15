@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Soft New Tab",
+  "version": "3.0",
+  "description": "自定义浏览器主页",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.open-meteo.com/*",
+    "https://suggestqueries.google.com/*",
+    "https://api.bing.com/*",
+    "https://duckduckgo.com/*",
+    "https://suggestion.baidu.com/*"
+  ]
+}
