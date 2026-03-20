@@ -1,0 +1,103 @@
+export default {
+  async fetch(request, env, ctx) {
+    // 只允许 GET
+    if (request.method !== "GET") {
+      return json({ error: "Method Not Allowed" }, 405);
+    }
+
+    const url = new URL(request.url);
+    const engine = url.searchParams.get("engine");
+    let q = url.searchParams.get("q") || "";
+
+    // -------- 参数处理 --------
+    q = normalizeQuery(q);
+
+    if (!engine || !q) {
+      return json({ error: "Missing engine or q" }, 400);
+    }
+
+    if (!["bing", "duckduckgo"].includes(engine)) {
+      return json({ error: "Unsupported engine" }, 400);
+    }
+
+    // -------- 缓存 key --------
+    const cacheKey = new Request(request.url, request);
+    const cache = caches.default;
+
+    // 尝试命中缓存
+    const cached = await cache.match(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    let targetUrl = "";
+
+    try {
+      // -------- 上游请求 --------
+      if (engine === "bing") {
+        targetUrl = `https://api.bing.com/osjson.aspx?query=${encodeURIComponent(q)}`;
+      }
+
+      if (engine === "duckduckgo") {
+        targetUrl = `https://duckduckgo.com/ac/?q=${encodeURIComponent(q)}&type=list`;
+      }
+
+      const resp = await fetch(targetUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0"
+        }
+      });
+
+      if (!resp.ok) {
+        return json({ error: "Upstream error" }, 502);
+      }
+
+      const text = await resp.text();
+
+      const response = new Response(text, {
+        status: 200,
+        headers: securityHeaders({
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "public, max-age=60"
+        })
+      });
+
+      // 写入缓存（异步）
+      ctx.waitUntil(cache.put(cacheKey, response.clone()));
+
+      return response;
+
+    } catch (err) {
+      return json({ error: "Service unavailable" }, 500);
+    }
+  }
+};
+
+// -------- 工具函数 --------
+
+// 输入标准化（防滥用）
+function normalizeQuery(input) {
+  return String(input || "")
+    .replace(/\s+/g, " ")     // 合并空格
+    .trim()
+    .slice(0, 100);           // 最大长度限制
+}
+
+// 安全 JSON 返回
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: securityHeaders({
+      "Content-Type": "application/json; charset=utf-8"
+    })
+  });
+}
+
+// 安全响应头
+function securityHeaders(headers = {}) {
+  return {
+    ...headers,
+    "Access-Control-Allow-Origin": "*",
+    "X-Content-Type-Options": "nosniff"
+  };
+}
